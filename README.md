@@ -9,7 +9,7 @@ Android Studio (Kotlin + Jetpack Compose) kullanılarak geliştirilmiştir.
 - Cihazdan PDF dosyası seçme
 - Seçilen kitapları kalıcı olarak saklama (DataStore / Room)
 - Kitap okuma deneyimi (sayfa kaydırma, zoom)
-- Moodee/Cozy tarzında arayüz tasarımı
+- Kullanıcı dostu arayüz tasarımı
 - Tema değişikliği ve arka plan müziği desteği
 
 ---
