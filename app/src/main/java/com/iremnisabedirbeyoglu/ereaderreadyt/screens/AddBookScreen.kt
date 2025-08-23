@@ -22,7 +22,7 @@ fun AddBookScreen() {
 
     var lastAddedUri by remember { mutableStateOf<Uri?>(null) }
 
-    // PDF Seçici
+    // PDF Seç
     val pdfPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
