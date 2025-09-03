@@ -92,6 +92,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.foundation:foundation")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
@@ -112,13 +113,7 @@ dependencies {
     // Accompanist - System UI Controller (Tema geçişleri ve sistem çubuğu kontrolü için)
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
 
-    // PDF Viewer - PdfiumAndroid (android-pdf-viewer yerine daha stabil bir alternatif)
-    // JitPack'te "PdfiumAndroid" paketi farklı kullanıcı adlarıyla barındırılabiliyor.
-    // Kullandığınız "shockar" kullanıcısı altındaki paket bazı sürümler için mevcut değil
-    // ve bu yüzden derleme sırasında çözümleme hatası veriyor. PdfiumAndroid projesinin
-    // resmi artefaktı `com.github.barteksc:pdfium-android` olarak Maven Central
-    // deposunda yer alıyor ve sürüm 1.9.0 stabil olarak yayınlanmış durumda【821090003402523†L9-L43】. Bu
-    // artefaktı kullanarak PDF görüntüleme işlemlerini gerçekleştirebilirsiniz.
+
     implementation("com.github.barteksc:pdfium-android:1.9.0") // PdfiumAndroid kütüphanesinin stabil sürümü
 
     // ExoPlayer - Arka plan müziği için

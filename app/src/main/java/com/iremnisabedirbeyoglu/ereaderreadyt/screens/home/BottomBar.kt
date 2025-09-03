@@ -1,4 +1,4 @@
-package com.iremnisabedirbeyoglu.ereaderreadyt.screens.home
+package com.iremnisabedirbeyoglu.ereaderreadyt.screens
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*

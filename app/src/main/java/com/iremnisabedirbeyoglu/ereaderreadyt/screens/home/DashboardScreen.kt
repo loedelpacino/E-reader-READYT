@@ -1,22 +1,27 @@
 package com.iremnisabedirbeyoglu.ereaderreadyt.screens
 
 import android.net.Uri
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import com.iremnisabedirbeyoglu.ereaderreadyt.data.PdfStorageManager
 import com.iremnisabedirbeyoglu.ereaderreadyt.screens.home.MusicToggleButton
 import getDisplayName
@@ -37,21 +42,33 @@ fun DashboardScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(horizontal = 20.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Üst kısım (başlık + müzik)
+        // Üst kısım (başlık + müzik butonu – yazısız)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Merhaba! ", style = MaterialTheme.typography.titleLarge)
-            // Eski: MusicToggle()
-            MusicToggleButton()  // << yeni buton + altta “Müzik”
+            Text(
+                text = "Merhaba!",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+            )
+            // yalnızca ikon: yazı yok
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
+            ) {
+                // Kendi bileşenin – ikonlu toggle
+                MusicToggleButton()
+            }
         }
 
-        Text(text = "Bugün ne yapmak istersin?", style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = "Bugün ne yapmak istersin?",
+            style = MaterialTheme.typography.bodyLarge
+        )
 
         // Hızlı eylemler
         Row(
@@ -61,7 +78,7 @@ fun DashboardScreen(navController: NavController) {
             QuickCard(
                 title = "Kütüphane",
                 subtitle = "Kitaplarını gör",
-                icon = Icons.Filled.List,
+                icon = Icons.Filled.Book,
                 modifier = Modifier.weight(1f)
             ) { navController.navigate("library") }
 
@@ -80,35 +97,47 @@ fun DashboardScreen(navController: NavController) {
             ) { navController.navigate("settings") }
         }
 
-        // Son eklenen kitap
+        // Son eklenen kitap kartı
         if (recentList.isNotEmpty()) {
             val uri = recentList.first()
             val displayName by produceState<String?>(initialValue = null, key1 = uri) {
                 value = getDisplayName(context.contentResolver, uri)
             }
 
-            Card(
+            ElevatedCard(
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .animateContentSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Text("Son eklenen", style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        "Son eklenen",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold)
+                    )
                     Text(
                         text = displayName ?: (uri.lastPathSegment ?: "PDF"),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyLarge
                     )
-                    OutlinedButton(
-                        onClick = {
-                            navController.navigate("reader?uri=${Uri.encode(uri.toString())}")
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        FilledTonalButton(
+                            onClick = {
+                                navController.navigate("reader?uri=${Uri.encode(uri.toString())}")
+                            },
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Text("Okumaya devam et")
                         }
-                    ) { Text("Okumaya devam et") }
+                    }
                 }
             }
         }
@@ -123,23 +152,42 @@ private fun QuickCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Card(
+    ElevatedCard(
         onClick = onClick,
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
-        modifier = modifier.height(120.dp)
+        modifier = modifier.height(118.dp)
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(14.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(icon, contentDescription = title)
+            // ikon için yumuşak bir baloncuk
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+                    shape = CircleShape
+                ) {
+                    Box(Modifier.size(36.dp), contentAlignment = Alignment.Center) {
+                        Icon(
+                            icon,
+                            contentDescription = title,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
             Column {
                 Text(
                     title,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -153,3 +201,4 @@ private fun QuickCard(
         }
     }
 }
+

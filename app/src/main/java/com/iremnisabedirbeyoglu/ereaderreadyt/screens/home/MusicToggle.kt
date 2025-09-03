@@ -48,10 +48,7 @@ fun MusicToggleButton() {
                 contentDescription = if (isMusicOn) "Müziği Kapat" else "Müziği Aç"
             )
         }
-        Text(
-            text = "Müzik",
-            style = MaterialTheme.typography.labelSmall
-        )
+
     }
 
     DisposableEffect(Unit) {
