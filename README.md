@@ -9,7 +9,7 @@ Android Studio (Kotlin + Jetpack Compose) kullanılarak geliştirilmiştir.
 - Cihazdan PDF dosyası seçme
 - Seçilen kitapları kalıcı olarak saklama (DataStore / Room)
 - Kitap okuma deneyimi (sayfa kaydırma, zoom)
-- Moodee/Cozy tarzında arayüz tasarımı
+- Kullanıcı dostu arayüz tasarımı
 - Tema değişikliği ve arka plan müziği desteği
 
 ---
@@ -23,7 +23,4 @@ Android Studio (Kotlin + Jetpack Compose) kullanılarak geliştirilmiştir.
 
 ---
 
-## Kurulum
-1. Bu repoyu klonlayın:
-   ```bash
-   git clone https://github.com/loedelpacino/E-reader-READYT.git
+
