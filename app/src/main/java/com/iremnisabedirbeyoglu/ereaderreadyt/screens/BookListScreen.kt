@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.iremnisabedirbeyoglu.ereaderreadyt.data.PdfStorageManager
 import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.ui.text.style.TextOverflow
+import getDisplayName
 
 @Composable
 fun BookListScreen(
@@ -44,26 +46,41 @@ fun BookListScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (uriListState.isEmpty()) {
-            Text("Henüz kitap eklenmedi.", color = Color.Gray)
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(Modifier.padding(24.dp)) {
+                    Text("Henüz kitap eklenmedi.", style = MaterialTheme.typography.titleLarge)
+                    Spacer(Modifier.height(8.dp))
+                    Text("“Kitap Ekle” ile cihazından bir PDF seçebilirsin.")
+                }
+            }
         } else {
             LazyColumn {
                 items(uriListState) { uri ->
+                    val resolver = LocalContext.current.contentResolver
+                    var displayName by remember(uri) { mutableStateOf<String?>(null) }
+                    LaunchedEffect(uri) {
+                        displayName = getDisplayName(resolver, uri)
+                    }
+
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
                             .clickable {
                                 navController?.navigate("reader?uri=${Uri.encode(uri.toString())}")
-                            }
-                        ,
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFFF9F4)
-                        )
+                            },
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9F4))
                     ) {
                         Text(
-                            text = uri.lastPathSegment ?: "PDF Dosyası",
+                            text = displayName ?: (uri.lastPathSegment ?: "PDF Dosyası"),
                             modifier = Modifier.padding(16.dp),
-                            color = Color(0xFF4E342E)
+                            color = Color(0xFF4E342E),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }

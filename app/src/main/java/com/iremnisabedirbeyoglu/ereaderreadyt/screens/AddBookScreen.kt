@@ -11,18 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.iremnisabedirbeyoglu.ereaderreadyt.data.PdfStorageManager
 import kotlinx.coroutines.launch
 
 @Composable
-fun AddBookScreen() {
+fun AddBookScreen(navController: NavController? = null) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
     var lastAddedUri by remember { mutableStateOf<Uri?>(null) }
 
-    // PDF Seç
     val pdfPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -32,43 +30,31 @@ fun AddBookScreen() {
                 Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
             lastAddedUri = it
-
-            // Kalıcı olarak URI’yi DataStore’a kaydet
             scope.launch {
                 PdfStorageManager.addPdfUri(context, it)
+                // Başarılı ekleme -> kütüphaneye
+                navController?.navigate("library") {
+                    launchSingleTop = true
+                    popUpTo("library") { inclusive = false }
+                }
             }
         }
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(24.dp)) {
-
-        Text(
-            text = "PDF Kitap Ekle",
-            style = MaterialTheme.typography.headlineSmall,
-            color = Color(0xFF4E342E)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+    ) {
+        Text("PDF Kitap Ekle", style = MaterialTheme.typography.headlineSmall, color = Color(0xFF4E342E))
+        Spacer(Modifier.height(16.dp))
         Button(
-            onClick = {
-                pdfPickerLauncher.launch(arrayOf("application/pdf"))
-            },
+            onClick = { pdfPickerLauncher.launch(arrayOf("application/pdf")) },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA1887F))
-        ) {
-            Text("Cihazdan PDF Seç", color = Color.White)
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
+        ) { Text("Cihazdan PDF Seç", color = Color.White) }
+        Spacer(Modifier.height(24.dp))
         lastAddedUri?.let { uri ->
-            Text(
-                text = "Eklenen dosya: ${uri.lastPathSegment}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF4E342E)
-            )
+            Text("Eklenen dosya: ${uri.lastPathSegment}", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF4E342E))
         }
     }
 }
