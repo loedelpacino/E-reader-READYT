@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.iremnisabedirbeyoglu.ereaderreadyt.R
 
 @Composable
-fun MusicToggle() {
+fun MusicToggleButton() {
     val context = LocalContext.current
     var isMusicOn by remember { mutableStateOf(false) }
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }

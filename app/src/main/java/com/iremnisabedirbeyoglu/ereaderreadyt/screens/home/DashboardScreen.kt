@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.iremnisabedirbeyoglu.ereaderreadyt.data.PdfStorageManager
-import com.iremnisabedirbeyoglu.ereaderreadyt.screens.home.MusicToggle
+import com.iremnisabedirbeyoglu.ereaderreadyt.screens.home.MusicToggleButton
 import getDisplayName
 
 @Composable
@@ -48,7 +48,7 @@ fun DashboardScreen(navController: NavController) {
         ) {
             Text(text = "Merhaba! ", style = MaterialTheme.typography.titleLarge)
             // Eski: MusicToggle()
-            MusicToggle()  // << yeni buton + altta “Müzik”
+            MusicToggleButton()  // << yeni buton + altta “Müzik”
         }
 
         Text(text = "Bugün ne yapmak istersin?", style = MaterialTheme.typography.bodyLarge)
