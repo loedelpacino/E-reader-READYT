@@ -23,7 +23,4 @@ Android Studio (Kotlin + Jetpack Compose) kullanılarak geliştirilmiştir.
 
 ---
 
-## Kurulum
-1. Bu repoyu klonlayın:
-   ```bash
-   git clone https://github.com/loedelpacino/E-reader-READYT.git
+
