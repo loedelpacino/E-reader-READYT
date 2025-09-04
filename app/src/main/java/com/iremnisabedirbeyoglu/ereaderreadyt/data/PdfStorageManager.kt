@@ -11,6 +11,7 @@ private val Context.dataStore by preferencesDataStore(name = "pdf_storage")
 
 object PdfStorageManager {
     private val PDF_LIST_KEY = stringSetPreferencesKey("pdf_uri_list")
+    private val LAST_READ_KEY = stringPreferencesKey("last_read_pdf") // yeni ekleme
 
     // URI’leri kaydet
     suspend fun addPdfUri(context: Context, uri: Uri) {
@@ -27,6 +28,20 @@ object PdfStorageManager {
         }
     }
 
+    // Son okunan kitabı kaydet
+    suspend fun setLastReadPdf(context: Context, uri: Uri) {
+        context.dataStore.edit { prefs ->
+            prefs[LAST_READ_KEY] = uri.toString()
+        }
+    }
+
+    // Son okunan kitabı al
+    fun getLastReadPdf(context: Context): Flow<Uri?> {
+        return context.dataStore.data.map { prefs ->
+            prefs[LAST_READ_KEY]?.let { Uri.parse(it) }
+        }
+    }
+
     // (İsteğe bağlı) URI’yi sil
     suspend fun removePdfUri(context: Context, uri: Uri) {
         context.dataStore.edit { preferences ->
@@ -40,3 +55,4 @@ object PdfStorageManager {
         context.dataStore.edit { it.clear() }
     }
 }
+

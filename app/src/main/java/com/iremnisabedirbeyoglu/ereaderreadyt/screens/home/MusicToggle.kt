@@ -1,4 +1,4 @@
-package com.iremnisabedirbeyoglu.ereaderreadyt.screens.home
+package com.iremnisabedirbeyoglu.ereaderreadyt.screens
 
 import android.media.MediaPlayer
 import androidx.compose.foundation.layout.Column

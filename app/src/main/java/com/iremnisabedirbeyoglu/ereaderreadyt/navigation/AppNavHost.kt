@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.iremnisabedirbeyoglu.ereaderreadyt.screens.*
 import com.iremnisabedirbeyoglu.ereaderreadyt.screens.BottomBar
+import com.iremnisabedirbeyoglu.ereaderreadyt.screens.home.DashboardScreen
 
 @Composable
 fun AppNavHost(

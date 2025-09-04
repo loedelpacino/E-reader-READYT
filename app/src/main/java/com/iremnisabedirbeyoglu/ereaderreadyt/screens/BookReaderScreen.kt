@@ -45,6 +45,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import getDisplayName
+import com.iremnisabedirbeyoglu.ereaderreadyt.data.PdfStorageManager // NEW
+
 
 private enum class ScrollMode { Vertical, Horizontal }
 
@@ -83,6 +85,8 @@ fun BookReaderScreen(
             renderer = PdfRenderer(fd)
             pageCount = renderer?.pageCount ?: 0
         }
+        // NEW: Son okunan kitabı kaydet
+        PdfStorageManager.setLastReadPdf(context, uri)
     }
     DisposableEffect(uri) {
         onDispose {

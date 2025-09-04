@@ -21,7 +21,7 @@ data class NavigationItem(
 fun BottomBar(navController: NavController) {
     val items = listOf(
         NavigationItem("Ana Sayfa", Icons.Default.Home, "dashboard"),
-        NavigationItem("Kütüphane", Icons.Default.List, "library"),
+        NavigationItem("Kütüphane", Icons.Default.MenuBook, "library"),
         NavigationItem("Ekle", Icons.Default.Add, "add"),
         NavigationItem("Ayarlar", Icons.Default.Settings, "settings")
     )

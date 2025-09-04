@@ -1,4 +1,4 @@
-package com.iremnisabedirbeyoglu.ereaderreadyt.screens
+package com.iremnisabedirbeyoglu.ereaderreadyt.screens.home
 
 import android.net.Uri
 import androidx.compose.animation.animateContentSize
@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,19 +22,31 @@ import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import com.iremnisabedirbeyoglu.ereaderreadyt.data.PdfStorageManager
-import com.iremnisabedirbeyoglu.ereaderreadyt.screens.home.MusicToggleButton
+import com.iremnisabedirbeyoglu.ereaderreadyt.screens.MusicToggleButton
 import getDisplayName
 
 @Composable
 fun DashboardScreen(navController: NavController) {
     val context = LocalContext.current
-    val recentList = remember { mutableStateListOf<android.net.Uri>() }
+
+    // Son eklenen 1 kitap
+    val recentList = remember { mutableStateListOf<Uri>() }
+
+    // Son okunan kitap
+    var lastRead by remember { mutableStateOf<Uri?>(null) }
 
     // Son eklenen 1 kitabı al
     LaunchedEffect(Unit) {
         PdfStorageManager.getPdfUriList(context).collectLatest { list ->
             recentList.clear()
             recentList.addAll(list.takeLast(1))
+        }
+    }
+
+    // Son okunan kitabı al
+    LaunchedEffect(Unit) {
+        PdfStorageManager.getLastReadPdf(context).collectLatest { uri ->
+            lastRead = uri
         }
     }
 
@@ -97,7 +108,51 @@ fun DashboardScreen(navController: NavController) {
             ) { navController.navigate("settings") }
         }
 
-        // Son eklenen kitap kartı
+        // --- Son Okunan kitap kartı ---
+        lastRead?.let { lastUri ->
+            val lastDisplayName by produceState<String?>(initialValue = null, key1 = lastUri) {
+                value = getDisplayName(context.contentResolver, lastUri)
+            }
+
+            ElevatedCard(
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .animateContentSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        "Son okunan",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold)
+                    )
+                    Text(
+                        text = lastDisplayName ?: (lastUri.lastPathSegment ?: "PDF"),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        FilledTonalButton(
+                            onClick = {
+                                navController.navigate("reader?uri=${Uri.encode(lastUri.toString())}")
+                            },
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Text("Kaldığın yerden devam et")
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- Son Eklenen kitap kartı ---
         if (recentList.isNotEmpty()) {
             val uri = recentList.first()
             val displayName by produceState<String?>(initialValue = null, key1 = uri) {
@@ -135,7 +190,7 @@ fun DashboardScreen(navController: NavController) {
                             },
                             shape = RoundedCornerShape(16.dp)
                         ) {
-                            Text("Okumaya devam et")
+                            Text("Aç")
                         }
                     }
                 }
@@ -201,4 +256,3 @@ private fun QuickCard(
         }
     }
 }
-
