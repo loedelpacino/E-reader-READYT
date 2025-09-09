@@ -1,3 +1,4 @@
+// path: app/src/main/java/com/iremnisabedirbeyoglu/ereaderreadyt/screens/SettingsScreen.kt
 package com.iremnisabedirbeyoglu.ereaderreadyt.screens
 
 import android.graphics.Color.parseColor
@@ -23,12 +24,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.iremnisabedirbeyoglu.ereaderreadyt.data.UserPreferencesManager
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(navController: NavHostController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scroll = rememberScrollState()
@@ -40,7 +42,7 @@ fun SettingsScreen() {
     var selectedWeight by remember { mutableStateOf("normal") } // normal | bold
     var selectedStyle by remember { mutableStateOf("normal") }  // normal | italic
 
-    // Load prefs
+    // Load prefs (flows → state)
     LaunchedEffect(Unit) { UserPreferencesManager.getFontSize(context).collect { selectedFontSize = it } }
     LaunchedEffect(Unit) { UserPreferencesManager.getBackgroundColor(context).collect { selectedBgColor = it } }
     LaunchedEffect(Unit) { UserPreferencesManager.getFontStyle(context).collect { selectedFont = it } }
@@ -60,7 +62,7 @@ fun SettingsScreen() {
             color = Color(0xFF4E342E)
         )
 
-        // Preview
+        // Önizleme
         PreviewCard(
             fontSizeKey = selectedFontSize,
             fontKey = selectedFont,
@@ -162,7 +164,6 @@ fun SettingsScreen() {
             }
         }
 
-        // Bottom padding so it doesn't collide with nav bar
         Spacer(Modifier.height(8.dp))
 
         OutlinedButton(
@@ -183,9 +184,9 @@ fun SettingsScreen() {
             shape = RoundedCornerShape(14.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp) // nav bar için alt boşluk
+                .padding(bottom = 24.dp)
         ) {
-            Icon(Icons.Default.Restore, contentDescription = null)
+            Icon(Icons.Filled.Restore, contentDescription = null)
             Spacer(Modifier.width(8.dp))
             Text("Varsayılanlara Dön")
         }
@@ -248,7 +249,7 @@ private fun PreviewCard(
     val family = when (fontKey) {
         "Sans-serif" -> FontFamily.SansSerif
         "Serif" -> FontFamily.Serif
-        else -> FontFamily.Serif
+        else -> FontFamily.Serif // Lora yoksa Serif'e düş
     }
     val weight = if (weightKey == "bold") FontWeight.Bold else FontWeight.Normal
     val style  = if (styleKey  == "italic") FontStyle.Italic  else FontStyle.Normal
@@ -276,4 +277,3 @@ private fun PreviewCard(
         }
     }
 }
-

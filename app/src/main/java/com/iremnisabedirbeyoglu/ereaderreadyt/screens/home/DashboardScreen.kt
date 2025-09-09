@@ -1,3 +1,4 @@
+// path: app/src/main/java/com/iremnisabedirbeyoglu/ereaderreadyt/screens/home/DashboardScreen.kt
 package com.iremnisabedirbeyoglu.ereaderreadyt.screens.home
 
 import android.net.Uri
@@ -22,8 +23,8 @@ import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import com.iremnisabedirbeyoglu.ereaderreadyt.data.PdfStorageManager
-import com.iremnisabedirbeyoglu.ereaderreadyt.screens.MusicToggleButton
-import getDisplayName
+import com.iremnisabedirbeyoglu.ereaderreadyt.screens.home.MusicToggleButton
+import com.iremnisabedirbeyoglu.ereaderreadyt.util.getDisplayName
 
 @Composable
 fun DashboardScreen(navController: NavController) {
@@ -63,7 +64,7 @@ fun DashboardScreen(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Merhaba!",
+                text = "Okumaya başla!",
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
             // yalnızca ikon: yazı yok
@@ -71,13 +72,13 @@ fun DashboardScreen(navController: NavController) {
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
             ) {
-                // Kendi bileşenin – ikonlu toggle
+                // İkonlu toggle
                 MusicToggleButton()
             }
         }
 
         Text(
-            text = "Bugün ne yapmak istersin?",
+            text = "Bugün ne okumak istersin?",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -91,14 +92,14 @@ fun DashboardScreen(navController: NavController) {
                 subtitle = "Kitaplarını gör",
                 icon = Icons.Filled.Book,
                 modifier = Modifier.weight(1f)
-            ) { navController.navigate("library") }
+            ) { navController.navigate("bookList") }
 
             QuickCard(
                 title = "Ekle",
                 subtitle = "PDF seç",
                 icon = Icons.Filled.Add,
                 modifier = Modifier.weight(1f)
-            ) { navController.navigate("add") }
+            ) { navController.navigate("addBook") } // AppNavHost'ta alias "add" da var
 
             QuickCard(
                 title = "Ayarlar",
@@ -108,7 +109,7 @@ fun DashboardScreen(navController: NavController) {
             ) { navController.navigate("settings") }
         }
 
-        // --- Son Okunan kitap kartı ---
+        //  Son Okunan kitap kartı
         lastRead?.let { lastUri ->
             val lastDisplayName by produceState<String?>(initialValue = null, key1 = lastUri) {
                 value = getDisplayName(context.contentResolver, lastUri)
@@ -152,7 +153,7 @@ fun DashboardScreen(navController: NavController) {
             }
         }
 
-        // --- Son Eklenen kitap kartı ---
+        // Son Eklenen kitap kartı
         if (recentList.isNotEmpty()) {
             val uri = recentList.first()
             val displayName by produceState<String?>(initialValue = null, key1 = uri) {

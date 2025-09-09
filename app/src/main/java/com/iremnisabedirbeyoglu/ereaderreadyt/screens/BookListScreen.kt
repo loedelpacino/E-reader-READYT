@@ -1,3 +1,4 @@
+// path: app/src/main/java/com/iremnisabedirbeyoglu/ereaderreadyt/screens/BookListScreen.kt
 package com.iremnisabedirbeyoglu.ereaderreadyt.screens
 
 import android.graphics.Bitmap
@@ -30,11 +31,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.iremnisabedirbeyoglu.ereaderreadyt.data.PdfStorageManager
+import com.iremnisabedirbeyoglu.ereaderreadyt.util.getDisplayName  // ✅ doğru import
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import getDisplayName
 
 @Composable
 fun BookListScreen(
@@ -68,7 +69,7 @@ fun BookListScreen(
             .padding(horizontal = 20.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Başlık + arama + görünüm toggle
+        // Başlık + görünüm toggle
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -78,9 +79,7 @@ fun BookListScreen(
                 text = "Kütüphanem",
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
-            IconButton(
-                onClick = { isGrid = !isGrid }
-            ) {
+            IconButton(onClick = { isGrid = !isGrid }) {
                 Icon(
                     imageVector = if (isGrid) Icons.Default.List else Icons.Default.GridView,
                     contentDescription = "Görünümü değiştir"
@@ -102,7 +101,7 @@ fun BookListScreen(
 
         if (filtered.isEmpty()) {
             EmptyLibrary(
-                onAddClick = { navController?.navigate("add") }
+                onAddClick = { navController?.navigate("addBook") }
             )
         } else {
             if (isGrid) {
@@ -160,10 +159,8 @@ private fun BookRowItem(
 ) {
     val context = LocalContext.current
     var displayName by remember(uri) { mutableStateOf<String?>(null) }
-    val thumb by remember(uri) { mutableStateOf(uri) }.let {
-        produceState<Bitmap?>(initialValue = null, key1 = uri) {
-            value = renderFirstPageThumbnail(context.contentResolver, uri, 96)
-        }
+    val thumb by produceState<Bitmap?>(initialValue = null, key1 = uri) {
+        value = renderFirstPageThumbnail(context.contentResolver, uri, 96)
     }
 
     LaunchedEffect(uri) {
@@ -184,9 +181,7 @@ private fun BookRowItem(
 
             Spacer(Modifier.width(12.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = displayName ?: (uri.lastPathSegment ?: "PDF"),
                     style = MaterialTheme.typography.titleMedium,
@@ -219,10 +214,8 @@ private fun BookCardGrid(
 ) {
     val context = LocalContext.current
     var displayName by remember(uri) { mutableStateOf<String?>(null) }
-    val thumb by remember(uri) { mutableStateOf(uri) }.let {
-        produceState<Bitmap?>(initialValue = null, key1 = uri) {
-            value = renderFirstPageThumbnail(context.contentResolver, uri, 140)
-        }
+    val thumb by produceState<Bitmap?>(initialValue = null, key1 = uri) {
+        value = renderFirstPageThumbnail(context.contentResolver, uri, 140)
     }
 
     LaunchedEffect(uri) {
@@ -346,7 +339,7 @@ private suspend fun renderFirstPageThumbnail(
                 renderer.openPage(0).use { page ->
                     val ratio = page.height.toFloat() / page.width.toFloat()
                     val w = targetWidthPx
-                    val h = (w * ratio).toInt()
+                    val h = (w * ratio).toInt().coerceAtLeast(1)
                     val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
                     page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     return@withContext bmp
@@ -357,4 +350,3 @@ private suspend fun renderFirstPageThumbnail(
         }
     }
 }
-

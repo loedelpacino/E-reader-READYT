@@ -1,62 +1,77 @@
-package com.iremnisabedirbeyoglu.ereaderreadyt.screens
+// path: app/src/main/java/com/iremnisabedirbeyoglu/ereaderreadyt/screens/home/MusicToggle.kt
+package com.iremnisabedirbeyoglu.ereaderreadyt.screens.home
 
-import android.media.MediaPlayer
+import android.content.Context
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.VolumeOff
-import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.MusicOff
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.iremnisabedirbeyoglu.ereaderreadyt.R
+import com.iremnisabedirbeyoglu.ereaderreadyt.media.MusicPlayerManager
 
 @Composable
-fun MusicToggleButton() {
+fun MusicToggleButton(
+    modifier: Modifier = Modifier,
+    showLabel: Boolean = false,
+    preferredRawNames: List<String> = listOf("cozy_music", "bg_music", "readyt_bg", "bgm", "music")
+) {
     val context = LocalContext.current
-    var isMusicOn by remember { mutableStateOf(false) }
-    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+    val isPlaying by MusicPlayerManager.isPlaying.collectAsState()
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    // Dinamik raw arama (derleme hatası önler)
+    val resIdState = remember { mutableIntStateOf(findFirstExistingRaw(context, preferredRawNames)) }
+    val resId = resIdState.intValue // 0 ise no-op
+
+    Column(modifier = modifier) {
         FilledTonalIconButton(
+            colors = IconButtonDefaults.filledTonalIconButtonColors(
+                // Çalarken biraz daha “aktif” görünsün
+                containerColor = if (isPlaying)
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.secondaryContainer
+            ),
             onClick = {
-                isMusicOn = !isMusicOn
-                if (isMusicOn) {
-                    mediaPlayer = MediaPlayer.create(context, R.raw.cozy_music).apply {
-                        isLooping = true
-                        start()
-                    }
-                } else {
-                    mediaPlayer?.stop()
-                    mediaPlayer?.release()
-                    mediaPlayer = null
-                }
-            },
-            modifier = Modifier
-                .width(44.dp)
-                .height(44.dp)
+                // Tek yerden yönetelim: toggle her iki durumu da ele alır
+                MusicPlayerManager.toggle(context, resId)
+            }
         ) {
+            // 🔧 DÜZELTME: İkon artık DURUMU gösteriyor (eylemi değil)
             Icon(
-                imageVector = if (isMusicOn) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
-                contentDescription = if (isMusicOn) "Müziği Kapat" else "Müziği Aç"
+                imageVector = if (isPlaying) Icons.Filled.MusicNote else Icons.Filled.MusicOff,
+                contentDescription = if (isPlaying) "Müzik çalıyor" else "Müzik kapalı"
             )
         }
-
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
+        if (showLabel) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = if (isPlaying) "Müzik açık" else "Müzik kapalı",
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }
 
+private fun findFirstExistingRaw(context: Context, names: List<String>): Int {
+    val pkg = context.packageName
+    val res = context.resources
+    for (name in names) {
+        val id = res.getIdentifier(name, "raw", pkg)
+        if (id != 0) return id
+    }
+    return 0
+}

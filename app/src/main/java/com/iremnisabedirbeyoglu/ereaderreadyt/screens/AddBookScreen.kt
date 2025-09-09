@@ -1,6 +1,6 @@
+// path: app/src/main/java/com/iremnisabedirbeyoglu/ereaderreadyt/screens/AddBookScreen.kt
 package com.iremnisabedirbeyoglu.ereaderreadyt.screens
 
-import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,9 +21,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.iremnisabedirbeyoglu.ereaderreadyt.data.PdfStorageManager
-import kotlinx.coroutines.launch
-import getDisplayName
+import com.iremnisabedirbeyoglu.ereaderreadyt.util.getDisplayName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddBookScreen(navController: NavController? = null) {
@@ -41,10 +41,9 @@ fun AddBookScreen(navController: NavController? = null) {
         uri?.let { selected ->
             persistAndSave(scope, context, listOf(selected)) { saved ->
                 lastAdded = saved
-                // başarı → kütüphaneye
-                navController?.navigate("library") {
+                navController?.navigate("bookList") {
                     launchSingleTop = true
-                    popUpTo("library") { inclusive = false }
+                    popUpTo("bookList") { inclusive = false }
                 }
             }
         }
@@ -57,9 +56,9 @@ fun AddBookScreen(navController: NavController? = null) {
         if (uris.isNotEmpty()) {
             persistAndSave(scope, context, uris) { saved ->
                 lastAdded = saved
-                navController?.navigate("library") {
+                navController?.navigate("bookList") {
                     launchSingleTop = true
-                    popUpTo("library") { inclusive = false }
+                    popUpTo("bookList") { inclusive = false }
                 }
             }
         }
@@ -175,18 +174,8 @@ private fun AssistChipBar(text: String) {
 }
 
 /**
- * URI’lere kalıcı okuma izni verip DataStore’a kaydeder.
+ * URI’lere kalıcı okuma izni verip DataStore’a kaydetme (güvenli yol).
  */
-private fun persistAndSave(
-    scope: androidx.lifecycle.LifecycleCoroutineScope? = null, // isteğe bağlı değilse null geçilebilir
-    context: android.content.Context,
-    uris: List<Uri>,
-    onDone: (List<Uri>) -> Unit
-) {
-    // Composition içinde rememberCoroutineScope() kullandığımız için
-    // bu overload'ı sadeleştiriyoruz:
-}
-
 private fun persistAndSave(
     scope: CoroutineScope,
     context: android.content.Context,
@@ -194,17 +183,10 @@ private fun persistAndSave(
     onDone: (List<Uri>) -> Unit
 ) {
     scope.launch {
-        // Kalıcı okuma izni
+        // Güvenli ekleme: kalıcı izin + listeye kaydet
         uris.forEach { uri ->
-            try {
-                context.contentResolver.takePersistableUriPermission(
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            } catch (_: Exception) { /* zaten izin verilmiş olabilir */ }
+            PdfStorageManager.addPdfSafely(context, context.contentResolver, uri)
         }
-        // DataStore’a ekle (set olduğu için kopyalar otomatik engellenir)
-        uris.forEach { PdfStorageManager.addPdfUri(context, it) }
         onDone(uris)
     }
 }
